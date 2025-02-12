@@ -290,20 +290,30 @@ class InversionGame {
     let reportText = "Inversion Sentence Challenge - Mistakes Report\n\n";
 
     this.wrongAnswers.forEach(mistake => {
-        reportText += `You wrote: "${mistake.sentence.replace("______", mistake.userAnswer.toUpperCase())}"\n`;
-        reportText += `The correct answer is: "${mistake.sentence.replace("______", mistake.correctAnswer.toUpperCase())}"\n\n`;
+        const userAnswer = mistake.userAnswer || "(no answer)";
+        const correctAnswer = mistake.correctAnswer;
+
+        // Replace the blank in the incomplete sentence with the user's answer
+        const userSentence = mistake.incompleteSentence.replace("______", userAnswer);
+
+        // Replace the blank in the incomplete sentence with the correct answer
+        const correctSentence = mistake.incompleteSentence.replace("______", correctAnswer);
+
+        // Add the original sentence, user's answer, and correct answer to the report
+        reportText += `Original sentence: "${mistake.sentence}"\n`;  // Display the original sentence
+        reportText += `You wrote: "${userSentence}"\n`;  // Show user's incorrect answer in the sentence
+        reportText += `The correct answer is: "${correctSentence}"\n\n`;  // Show correct answer in the sentence
     });
 
-    // Create a Blob and generate a download link
+    // Create a Blob and generate a download link for the report
     const blob = new Blob([reportText], { type: "text/plain" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "inversion_game_report.txt"; // Name of the downloaded file
+    link.download = "inversion_game_report.txt";  // Report file name
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link); // Clean up
 }
-
 
     restartGame() {
         this.gameActive = false;
