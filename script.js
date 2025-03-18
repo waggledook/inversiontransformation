@@ -17,113 +17,168 @@ class InversionGame {
     }
 
     initUI() {
-    console.log("Game script is running!");
-
-    document.body.innerHTML = `
-        <style>
-            body {
-                font-family: 'Poppins', sans-serif;
-                background: linear-gradient(135deg, #2E3192, #1BFFFF);
-                color: white;
-                text-align: center;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                height: 100vh;
-                margin: 0;
-            }
-            #game-container {
-                background: rgba(0, 0, 0, 0.8);
-                padding: 20px;
-                border-radius: 10px;
-                box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-                text-align: center;
-            }
-            p {
-                font-size: 18px;
-            }
-            input {
-                padding: 10px;
-                font-size: 16px;
-                border-radius: 5px;
-                border: none;
-                outline: none;
-                text-align: center;
-            }
-            input.correct {
-                border: 2px solid #00FF00;
-                background-color: rgba(0, 255, 0, 0.2);
-            }
-            input.incorrect {
-                border: 2px solid #FF0000;
-                background-color: rgba(255, 0, 0, 0.2);
-            }
-            button {
-                padding: 10px 20px;
-                font-size: 18px;
-                margin-top: 10px;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: 0.3s;
-            }
-            button:hover {
-                opacity: 0.8;
-            }
-            #start {
-                background: #28a745;
-                color: white;
-            }
-            #restart {
-                background: #007bff;
-                color: white;
-                display: none;
-            }
-            #review {
-                background: #ffc107;
-                color: black;
-                display: none;
-            }
-            #timer-bar {
-                width: 100%;
-                height: 10px;
-                background: red;
-                transition: width 1s linear;
-            }
-            /* Add this section for the "Download Report" button */
-            #downloadReport {
-                display: none; /* Start off hidden */
-                padding: 10px 20px;
-                font-size: 18px;
-                margin-top: 20px;
-                background: #ff6f61;
-                color: white;
-                border-radius: 5px;
-            }
-        </style>
-        <div id="game-container">
-            <h1>Inversion Sentence Challenge</h1>
-            <div id="timer-bar"></div>
-            <p id="timer">Time left: 120s</p>
-            <p id="sentence"></p>
-            <input type="text" id="answer" autofocus>
-            <p id="feedback"></p>
-            <p>Score: <span id="score">0</span></p>
-            <button id="start">Start Game</button>
-            <button id="restart">Restart</button>
-            <button id="review">Review Mistakes</button>
-            <!-- This is the Download Report button -->
-            <button id="downloadReport">Download Report</button>
-        </div>
-    `;
-
-    document.getElementById("start").addEventListener("click", () => this.startGame());
-    document.getElementById("restart").addEventListener("click", () => this.restartGame());
-    document.getElementById("review").addEventListener("click", () => this.startReview());
-    this.setupInputListener();
+        console.log("Game script is running!");
+        document.body.innerHTML = `
+            <style>
+                body {
+                    font-family: 'Poppins', sans-serif;
+                    background: linear-gradient(135deg, #2E3192, #1BFFFF);
+                    color: white;
+                    text-align: center;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    margin: 0;
+                }
+                /* Instructions overlay */
+                #instructions-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.8);
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                }
+                #instructions-box {
+                    background: #333;
+                    padding: 20px;
+                    border-radius: 10px;
+                    max-width: 500px;
+                    text-align: left;
+                }
+                #instructions-box h2 {
+                    margin-top: 0;
+                }
+                #close-instructions {
+                    margin-top: 15px;
+                    padding: 5px 10px;
+                    background: #28a745;
+                    border: none;
+                    border-radius: 5px;
+                    color: white;
+                    cursor: pointer;
+                    transition: 0.3s;
+                }
+                #close-instructions:hover {
+                    opacity: 0.8;
+                }
+                /* Game container styles */
+                #game-container {
+                    background: rgba(0, 0, 0, 0.8);
+                    padding: 20px;
+                    border-radius: 10px;
+                    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+                    text-align: center;
+                    margin-top: 20px;
+                }
+                p {
+                    font-size: 18px;
+                }
+                input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    text-align: center;
+    width: 80%;          /* Makes the text bar wider */
+    display: block;      /* Ensures it's treated as a block element */
+    margin: 10px auto;   /* Centers it horizontally */
 }
+                input.correct {
+                    border: 2px solid #00FF00;
+                    background-color: rgba(0, 255, 0, 0.2);
+                }
+                input.incorrect {
+                    border: 2px solid #FF0000;
+                    background-color: rgba(255, 0, 0, 0.2);
+                }
+                button {
+                    padding: 10px 20px;
+                    font-size: 18px;
+                    margin-top: 10px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    transition: 0.3s;
+                }
+                button:hover {
+                    opacity: 0.8;
+                }
+                #start {
+                    background: #28a745;
+                    color: white;
+                }
+                #restart {
+                    background: #007bff;
+                    color: white;
+                    display: none;
+                }
+                #review {
+                    background: #ffc107;
+                    color: black;
+                    display: none;
+                }
+                #downloadReport {
+                    display: none;
+                    padding: 10px 20px;
+                    font-size: 18px;
+                    margin-top: 20px;
+                    background: #ff6f61;
+                    color: white;
+                    border-radius: 5px;
+                }
+                #timer-bar {
+                    width: 100%;
+                    height: 10px;
+                    background: red;
+                    transition: width 1s linear;
+                }
+            </style>
+            <!-- Instructions Overlay -->
+            <div id="instructions-overlay">
+                <div id="instructions-box">
+                    <h2>How to Play</h2>
+                    <p>Welcome to the Inversion Sentence Challenge!</p>
+                    <p>Read the original sentence, then complete the incomplete sentence by inverting it correctly.</p>
+                    <p>You have 120 seconds to complete the challenge.</p>
+                    <p>Good luck!</p>
+                    <button id="close-instructions">Got It!</button>
+                </div>
+            </div>
+            <!-- Game Container -->
+            <div id="game-container">
+                <h1>Inversion Sentence Challenge</h1>
+                <div id="timer-bar"></div>
+                <p id="timer">Time left: 120s</p>
+                <p id="sentence"></p>
+                <input type="text" id="answer" autofocus>
+                <p id="feedback"></p>
+                <p>Score: <span id="score">0</span></p>
+                <p>Best Score: <span id="bestScore">0</span></p>
+                <button id="start">Start Game</button>
+                <button id="restart">Restart</button>
+                <button id="review">Review Mistakes</button>
+                <button id="downloadReport">Download Report</button>
+            </div>
+        `;
 
+        document.getElementById("close-instructions").addEventListener("click", () => {
+            document.getElementById("instructions-overlay").style.display = "none";
+        });
+        document.getElementById("start").addEventListener("click", () => this.startGame());
+        document.getElementById("restart").addEventListener("click", () => this.restartGame());
+        document.getElementById("review").addEventListener("click", () => this.startReview());
+        this.setupInputListener();
+        this.updateBestScoreDisplay();
+    }
 
     setupInputListener() {
         document.getElementById("answer").addEventListener("keyup", (event) => {
@@ -131,6 +186,11 @@ class InversionGame {
                 this.checkAnswer();
             }
         });
+    }
+
+    updateBestScoreDisplay() {
+        let storedBest = localStorage.getItem("bestScoreInversion") || 0;
+        document.getElementById("bestScore").textContent = storedBest;
     }
 
     startGame() {
@@ -145,6 +205,7 @@ class InversionGame {
         document.getElementById("start").style.display = "none";
         document.getElementById("restart").style.display = "block";
         document.getElementById("review").style.display = "none";
+        document.getElementById("downloadReport").style.display = "none";
         document.getElementById("score").textContent = this.score;
         document.getElementById("feedback").textContent = "";
         document.getElementById("timer-bar").style.width = "100%";
@@ -156,7 +217,7 @@ class InversionGame {
 
     updateSentence() {
         if (this.currentIndex < this.sentences.length) {
-            // Show original sentence without inversion, followed by the incomplete version
+            // Show original sentence and incomplete sentence separated by a newline
             const originalSentence = this.sentences[this.currentIndex].sentence;
             const incompleteSentence = this.sentences[this.currentIndex].incompleteSentence;
             document.getElementById("sentence").textContent = `${originalSentence}\n\n${incompleteSentence}`;
@@ -170,55 +231,63 @@ class InversionGame {
     if (!this.gameActive && !this.reviewMode) return;
 
     const input = document.getElementById("answer");
-    const userInput = input.value.trim().toLowerCase(); // Normalize input to lowercase and remove extra spaces
+    const userInput = input.value.trim().toLowerCase();
     const currentSet = this.reviewMode ? this.wrongAnswers : this.sentences;
-    const correctAnswer = currentSet[this.currentIndex].correctAnswer.toLowerCase(); // Normalize the correct answer to lowercase
+    const correctAnswer = currentSet[this.currentIndex].correctAnswer.toLowerCase();
 
     if (userInput === correctAnswer) {
         if (!this.reviewMode) {
-            this.score += 10;  // Score 10 for correct answer
-            document.getElementById("score").textContent = this.score;  // Update score display
+            this.score += 10;
+            document.getElementById("score").textContent = this.score;
         }
         input.classList.add("correct");
+        // Delay of 500ms for correct answer feedback
+        if (this.reviewMode) {
+            setTimeout(() => {
+                input.classList.remove("correct");
+                input.value = "";
+                this.currentIndex++;
+                this.showReviewSentence();
+            }, 500);
+        } else {
+            setTimeout(() => {
+                input.classList.remove("correct");
+                input.value = "";
+                this.currentIndex++;  // Increment the sentence index here
+                this.updateSentence();
+            }, 500);
+        }
     } else {
         if (!this.reviewMode) {
-            this.score -= 1;  // Deduct 1 for incorrect answer
-            document.getElementById("score").textContent = this.score;  // Update score display
+            this.score -= 1;
+            document.getElementById("score").textContent = this.score;
         }
         input.classList.add("incorrect");
         document.getElementById("feedback").textContent = `Incorrect: Correct answer is '${currentSet[this.currentIndex].correctAnswer}'`;
 
-        // Store incorrect answers for review mode
-        if (!this.reviewMode) {
+        if (this.reviewMode) {
+            setTimeout(() => {
+                input.classList.remove("incorrect");
+                input.value = "";
+                this.currentIndex++;
+                this.showReviewSentence();
+            }, 1000);
+        } else {
             this.wrongAnswers.push({
                 sentence: currentSet[this.currentIndex].sentence,
-                incompleteSentence: currentSet[this.currentIndex].incompleteSentence, // Add this line
+                incompleteSentence: currentSet[this.currentIndex].incompleteSentence,
                 correctAnswer: currentSet[this.currentIndex].correctAnswer,
                 userAnswer: userInput || "(no answer)"
             });
-        }
-    }
-
-    if (this.reviewMode) {
-        setTimeout(() => {
-            input.classList.remove("correct", "incorrect");
-            this.currentIndex++;  // Move to the next mistake in review mode
-            this.showReviewSentence();
-        }, 1000);
-    } else {
-        this.currentIndex++;  // Move to next sentence in normal game mode
-        if (userInput !== correctAnswer) {  // Keep delay for incorrect answers
             setTimeout(() => {
-                input.classList.remove("correct", "incorrect");
+                input.classList.remove("incorrect");
+                input.value = "";
+                this.currentIndex++;  // Increment the sentence index here as well
                 this.updateSentence();
             }, 1000);
-        } else {
-            input.classList.remove("correct", "incorrect");
-            this.updateSentence();  // No delay for correct answers
         }
     }
 }
-
 
     startTimer() {
         this.interval = setInterval(() => {
@@ -234,112 +303,129 @@ class InversionGame {
     }
 
     endGame() {
-    this.gameActive = false;
-    clearInterval(this.interval);
-    document.getElementById("review").style.display = this.wrongAnswers.length > 0 ? "block" : "none";
-
-    // Show the download report button if mistakes were made
-    if (this.wrongAnswers.length > 0) {
-        const reportButton = document.getElementById("downloadReport");
-        if (reportButton) {
-            reportButton.style.display = "block"; // Show the download report button
-            reportButton.addEventListener("click", () => this.generateReport()); // Attach click event
-        }
-    }
-}
-
-    startReview() {
-        if (this.wrongAnswers.length === 0) return;
-        this.reviewMode = true;
-        this.currentIndex = 0;
-        this.showReviewSentence();
-    }
-
-    showReviewSentence() {
-    if (this.currentIndex < this.wrongAnswers.length) {
-        const currentMistake = this.wrongAnswers[this.currentIndex];
-
-        // Display the original sentence and the gapped sentence
-        const originalSentence = currentMistake.sentence;
-        const incompleteSentence = currentMistake.incompleteSentence;
-
-        // Combine both sentences for display
-        const displayText = `${originalSentence}\n\n${incompleteSentence}`;
-
-        // Show the combined text
-        document.getElementById("sentence").textContent = displayText;
-
-        // Reset the input field (ready for the next round if needed)
-        document.getElementById("answer").value = "";
-        document.getElementById("feedback").textContent = ""; // Clear feedback
-    } else {
-        // When review is complete, show message and reset review mode
-        document.getElementById("sentence").textContent = "Review complete!";
-        document.getElementById("answer").style.display = "none";
-        document.getElementById("feedback").textContent = "";
-        this.reviewMode = false; // Reset review mode
-        this.currentIndex = 0; // Reset index
-    }
-}
-    generateReport() {
-    if (this.wrongAnswers.length === 0) {
-        alert("No mistakes were made. Great job!");
-        return;
-    }
-
-    let reportText = "Inversion Sentence Challenge - Mistakes Report\n\n";
-
-    this.wrongAnswers.forEach(mistake => {
-        const userAnswer = mistake.userAnswer || "(no answer)";
-        const correctAnswer = mistake.correctAnswer;
-
-        // Replace the blank in the incomplete sentence with the user's answer
-        const userSentence = mistake.incompleteSentence.replace("______", userAnswer);
-
-        // Replace the blank in the incomplete sentence with the correct answer
-        const correctSentence = mistake.incompleteSentence.replace("______", correctAnswer);
-
-        // Add the original sentence, user's answer, and correct answer to the report
-        reportText += `Original sentence: "${mistake.sentence}"\n`;  // Display the original sentence
-        reportText += `You wrote: "${userSentence}"\n`;  // Show user's incorrect answer in the sentence
-        reportText += `The correct answer is: "${correctSentence}"\n\n`;  // Show correct answer in the sentence
-    });
-
-    // Create a Blob and generate a download link for the report
-    const blob = new Blob([reportText], { type: "text/plain" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "inversion_game_report.txt";  // Report file name
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link); // Clean up
-}
-
-    restartGame() {
         this.gameActive = false;
-        this.reviewMode = false;
         clearInterval(this.interval);
 
-        // Reset game variables
-        this.currentIndex = 0;
-        this.score = 0;
-        this.timer = 120;
-        this.wrongAnswers = [];
-        this.sentences = this.shuffle([...this.originalSentences]);
+        // Check and update best score
+        let storedBest = localStorage.getItem("bestScoreInversion") || 0;
+        let newHighScore = false;
+        if (this.score > storedBest) {
+            localStorage.setItem("bestScoreInversion", this.score);
+            newHighScore = true;
+        }
+        this.updateBestScoreDisplay();
 
-        // Reset UI
-        document.getElementById("score").textContent = this.score;
+        // Build Game Over message
+        let endMessage = `
+            <div class="game-over">Game Over!</div>
+            <div>Your score: ${this.score}</div>
+        `;
+        if (newHighScore) {
+            endMessage += `<div class="new-high">New High Score!</div>`;
+        }
+        document.getElementById("sentence").innerHTML = endMessage;
+
+        // Hide answer input and clear feedback
+        document.getElementById("answer").style.display = "none";
         document.getElementById("feedback").textContent = "";
-        document.getElementById("sentence").textContent = "";
-        document.getElementById("answer").value = "";
-        document.getElementById("timer").textContent = "Time left: 120s";
-        document.getElementById("timer-bar").style.width = "100%";
 
-        // Show start button
-        document.getElementById("review").style.display = "none";
-        document.getElementById("restart").style.display = "none";
-        document.getElementById("start").style.display = "block";
+        // Show restart button and review button (if mistakes exist)
+        document.getElementById("restart").style.display = "block";
+        document.getElementById("review").style.display = this.wrongAnswers.length > 0 ? "block" : "none";
+
+        // Show Download Report button if mistakes were made
+        if (this.wrongAnswers.length > 0) {
+            const reportButton = document.getElementById("downloadReport");
+            if (reportButton) {
+                reportButton.style.display = "block";
+                reportButton.addEventListener("click", () => this.generateReport());
+            }
+        }
     }
+
+    startReview() {
+    if (this.wrongAnswers.length === 0) return;
+    this.reviewMode = true;
+    this.currentIndex = 0;
+    // Ensure the answer input is visible during review:
+    document.getElementById("answer").style.display = "block";
+    this.showReviewSentence();
+}
+
+
+    showReviewSentence() {
+        if (this.currentIndex < this.wrongAnswers.length) {
+            const currentMistake = this.wrongAnswers[this.currentIndex];
+            const originalSentence = currentMistake.sentence;
+            const incompleteSentence = currentMistake.incompleteSentence;
+            const displayText = `${originalSentence}\n\n${incompleteSentence}`;
+            document.getElementById("sentence").textContent = displayText;
+            document.getElementById("answer").value = "";
+            document.getElementById("feedback").textContent = "";
+        } else {
+            document.getElementById("sentence").textContent = "Review complete!";
+            document.getElementById("answer").style.display = "none";
+            document.getElementById("feedback").textContent = "";
+            this.reviewMode = false;
+            this.currentIndex = 0;
+        }
+    }
+
+    generateReport() {
+        if (this.wrongAnswers.length === 0) {
+            alert("No mistakes were made. Great job!");
+            return;
+        }
+
+        let reportText = "Inversion Sentence Challenge - Mistakes Report\n\n";
+        this.wrongAnswers.forEach(mistake => {
+            const userAnswer = mistake.userAnswer || "(no answer)";
+            const correctAnswer = mistake.correctAnswer;
+            const userSentence = mistake.incompleteSentence.replace("______", userAnswer);
+            const correctSentence = mistake.incompleteSentence.replace("______", correctAnswer);
+            reportText += `Original sentence: "${mistake.sentence}"\n`;
+            reportText += `You wrote: "${userSentence}"\n`;
+            reportText += `The correct answer is: "${correctSentence}"\n\n`;
+        });
+
+        const blob = new Blob([reportText], { type: "text/plain" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "inversion_game_report.txt";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    restartGame() {
+    this.gameActive = false;
+    this.reviewMode = false;
+    clearInterval(this.interval);
+    this.currentIndex = 0;
+    this.score = 0;
+    this.timer = 120;
+    this.wrongAnswers = [];
+    this.sentences = this.shuffle([...this.originalSentences]);
+
+    document.getElementById("score").textContent = this.score;
+    document.getElementById("feedback").textContent = "";
+    document.getElementById("sentence").textContent = "";
+    document.getElementById("answer").value = "";
+    document.getElementById("timer").textContent = "Time left: 120s";
+    document.getElementById("timer-bar").style.width = "100%";
+
+    // Re-show the answer input with centralized styling and increased width
+    const answerInput = document.getElementById("answer");
+    answerInput.style.display = "block";
+    answerInput.style.width = "80%";
+    answerInput.style.margin = "10px auto";
+
+    // Hide review and restart buttons, show the start button
+    document.getElementById("review").style.display = "none";
+    document.getElementById("restart").style.display = "none";
+    document.getElementById("start").style.display = "block";
+}
+
 }
 
 // Sentences with negative adverbial prompts for inversion
